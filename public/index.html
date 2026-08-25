@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PVE Leaderboard by KONTOL - Ninja Tracker</title>
+  
+  <!-- Apple System Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff2a5f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <style>
+    :root {
+      --bg-midnight: #08090e;
+      --bg-card: rgba(18, 20, 29, 0.75);
+      --bg-card-hover: rgba(28, 32, 46, 0.85);
+      --border-glass: rgba(255, 255, 255, 0.1);
+      --accent-crimson: #ff2a5f;
+      --accent-crimson-glow: rgba(255, 42, 95, 0.35);
+      --accent-gold: #f5c451;
+      --accent-gold-glow: rgba(245, 196, 81, 0.3);
+      --accent-green: #5bd17f;
+      --text-main: #f1f3f9;
+      --text-muted: #8e95ab;
+      --text-dim: #5c6275;
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      --font-ninja: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-main);
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background-color: var(--bg-midnight);
+      color: var(--text-main);
+      position: relative;
+    }
+
+    body {
+      padding: 16px 12px 80px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100vw;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255, 42, 95, 0.15) 0%, rgba(8, 9, 14, 0) 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .header-bar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .title-wrapper {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .ninja-emblem {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-crimson), #800020);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px var(--accent-crimson-glow);
+    }
+
+    h1 {
+      font-family: var(--font-ninja);
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(180deg, #ffffff 30%, #d1d5db 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+
+    .title-author {
+      color: var(--accent-crimson);
+      text-shadow: 0 0 15px var(--accent-crimson-glow);
+    }
+
+    .clock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 42, 95, 0.08);
+      border: 1px solid rgba(255, 42, 95, 0.2);
+      padding: 5px 12px;
+      border-radius: 30px;
+      font-size: 12px;
+      color: #ff9ebb;
+      font-weight: 500;
+    }
+
+    .clock-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-crimson);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-crimson);
+      animation: pulseDot 1.5s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .top-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-boxes {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .timer-unit {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-glass);
+      border-radius: 8px;
+      padding: 6px 2px;
+      text-align: center;
+    }
+
+    .timer-unit b {
+      display: block;
+      font-size: 16px;
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+
+    .timer-unit span {
+      font-size: 8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .chaos-highlight-card {
+      background: linear-gradient(135deg, rgba(255, 42, 95, 0.15), rgba(245, 196, 81, 0.1));
+      border: 2px solid var(--accent-crimson);
+      box-shadow: 0 0 25px var(--accent-crimson-glow);
+      position: relative;
+      overflow: hidden;
+      animation: borderGlowPulse 3s infinite ease-in-out;
+    }
+
+    @keyframes borderGlowPulse {
+      0%, 100% { border-color: var(--accent-crimson); }
+      50% { border-color: var(--accent-gold); }
+    }
+
+    .chaos-tag {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: linear-gradient(135deg, var(--accent-crimson), var(--accent-gold));
+      color: #000;
+      font-weight: 800;
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+
+    .chaos-user-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rank-gap-box {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #ffd479;
+    }
+
+    .guild-standings-card {
+      padding: 16px 18px;
+      margin-bottom: 20px;
+    }
+
+    .guild-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .guild-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .guild-box:hover {
+      border-color: var(--accent-crimson);
+      background: rgba(255, 42, 95, 0.08);
+    }
+
+    .guild-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .guild-box-score {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--accent-gold);
+      margin-top: 4px;
+    }
+
+    .controls-card {
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .controls-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 10px 14px 10px 36px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-crimson);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .guild-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .guild-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .guild-pill.active {
+      background: rgba(255, 42, 95, 0.2);
+      border-color: var(--accent-crimson);
+      color: #fff;
+    }
+
+    .action-btn {
+      background: rgba(255, 42, 95, 0.15);
+      border: 1px solid rgba(255, 42, 95, 0.3);
+      color: #ff85a2;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 42, 95, 0.3);
+      color: #fff;
+    }
+
+    .sound-btn {
+      background: rgba(245, 196, 81, 0.1);
+      border: 1px solid rgba(245, 196, 81, 0.3);
+      color: var(--accent-gold);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .lb-table {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .lb-table th {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(12, 14, 22, 0.92);
+      border-bottom: 1px solid var(--border-glass);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .lb-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+    }
+
+    .lb-table tbody tr:hover td {
+      background: var(--bg-card-hover);
+    }
+
+    .rank-cell {
+      font-weight: 800;
+      width: 50px;
+      text-align: center;
+    }
+
+    .rank-1 { color: #ffe066; font-size: 15px; }
+    .rank-2 { color: #d1d5db; font-size: 14px; }
+    .rank-3 { color: #f97316; font-size: 14px; }
+    .rank-top10 { color: var(--accent-gold); font-weight: 700; }
+
+    .player-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .guild-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .score-cell {
+      text-align: right;
+      font-weight: 700;
+      color: var(--accent-gold);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .gain-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(91, 209, 127, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(91, 209, 127, 0.3);
+    }
+
+    .online-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .status-dot.online {
+      background: var(--accent-green);
+      box-shadow: 0 0 6px var(--accent-green);
+    }
+
+    .status-dot.offline {
+      background: var(--text-dim);
+    }
+
+    .tr-chaos-kontol td {
+      background: linear-gradient(90deg, rgba(255, 42, 95, 0.2), rgba(245, 196, 81, 0.12)) !important;
+      border-top: 2px solid var(--accent-crimson);
+      border-bottom: 2px solid var(--accent-crimson);
+    }
+
+    .tr-chaos-kontol td:first-child {
+      border-left: 2px solid var(--accent-crimson);
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+    }
+
+    .tr-chaos-kontol td:last-child {
+      border-right: 2px solid var(--accent-crimson);
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+
+    .tr-chaos-kontol .player-cell {
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .you-badge {
+      background: linear-gradient(135deg, var(--accent-crimson), var(--accent-gold));
+      color: #000;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .trend-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .fab-container {
+      position: fixed;
+      bottom: 20px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 99;
+    }
+
+    .fab-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(18, 20, 29, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid var(--accent-crimson);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-crimson-glow);
+      cursor: pointer;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      width: 92%;
+      max-width: 600px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: none; border: none;
+      color: var(--text-muted); font-size: 20px;
+      cursor: pointer;
+    }
+
+    .canvas-container {
+      width: 100%;
+      height: 200px;
+      margin-top: 14px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 11px;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 12px 8px 80px; }
+      h1 { font-size: 22px; }
+      .stat-val { font-size: 18px; }
+      .guild-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header Bar -->
+  <div class="header-bar">
+    <div class="title-wrapper">
+      <div class="ninja-emblem">🥷</div>
+      <h1>PVE LEADERBOARD <span class="title-author">BY KONTOL</span></h1>
+    </div>
+    <div>
+      <div class="clock-badge">
+        <div class="clock-dot"></div>
+        <span id="sgt-clock">Singapore Time (SGT UTC+8): --:--:--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Analytics Grid -->
+  <div class="top-stats-grid">
+    
+    <!-- Round Status Card (Dynamic Season 3) -->
+    <div class="glass-card stat-card">
+      <div>
+        <div class="stat-label">
+          <span>Season Status</span>
+          <span style="color:var(--accent-gold);" id="season-title-val">Season 3 · Round 1/2</span>
+        </div>
+        <div class="stat-val" style="font-size:15px; color:#ffd479;">⏸️ Round Countdown</div>
+      </div>
+      <div class="timer-boxes" id="cd-boxes">
+        <div class="timer-unit"><b id="cd-d">13</b><span>Days</span></div>
+        <div class="timer-unit"><b id="cd-h">11</b><span>Hours</span></div>
+        <div class="timer-unit"><b id="cd-m">00</b><span>Minutes</span></div>
+        <div class="timer-unit"><b id="cd-s">51</b><span>Seconds</span></div>
+      </div>
+    </div>
+
+    <!-- Live Online Counter Card -->
+    <div class="glass-card stat-card">
+      <div class="stat-label">
+        <span>Active Ninja Players</span>
+        <span class="online-badge"><i class="status-dot online"></i> Realtime KV</span>
+      </div>
+      <div class="stat-val" id="online-count-val">6 Online</div>
+      <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+        Tracking live score updates
+      </div>
+    </div>
+
+    <!-- CHAOS KONTOL Quick Tracker Card + Rank Gap Calculator -->
+    <div class="glass-card stat-card chaos-highlight-card" onclick="openPlayerModal('CHAOS KONTOL')" style="cursor:pointer;">
+      <div class="chaos-tag">👑 HIGHLIGHT PLAYER</div>
+      <div class="chaos-user-title">
+        CHAOS KONTOL <span style="font-size:13px; color:var(--accent-gold);">(#<span id="chaos-rank-val">67</span>)</span>
+      </div>
+      <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+          <div style="font-size:10px; color:var(--text-muted);">TOTAL SCORE</div>
+          <div style="font-size:18px; font-weight:800; color:var(--accent-gold);" id="chaos-score-val">0</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:10px; color:var(--text-muted);">DAILY GAIN (SGT)</div>
+          <div style="font-size:13px; font-weight:700; color:var(--accent-green);" id="chaos-daily-val">+0</div>
+        </div>
+      </div>
+      <div class="rank-gap-box">
+        <span>🎯 Gap to Rank #66 (<span id="target-player-name">PF·SAS</span>):</span>
+        <b style="color:var(--accent-green);" id="target-gap-val">+3,500 pts (~1 match)</b>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Guild Standings Rivalry Summary Card (Renders ALL Clans) -->
+  <div class="glass-card guild-standings-card">
+    <div class="stat-label">
+      <span>⚔️ All Clan / Guild Standings & Dominance</span>
+      <span style="color:var(--text-muted); font-weight:500;" id="clan-count-badge">Displaying All Clans</span>
+    </div>
+    <div class="guild-grid" id="guild-standings-grid">
+      <!-- Rendered dynamically for ALL clans -->
+    </div>
+  </div>
+
+  <!-- Controls Bar -->
+  <div class="glass-card controls-card">
+    <div class="controls-top-row">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input" placeholder="Cari nama player / clan..." oninput="renderTable()">
+      </div>
+      
+      <div style="display:flex; gap:8px;">
+        <button class="action-btn" onclick="triggerManualSync()">
+          🔄 Sync Live Data
+        </button>
+        <button class="action-btn" style="background:rgba(245,196,81,0.15); color:var(--accent-gold); border-color:rgba(245,196,81,0.3);" onclick="openIngestModal()">
+          📥 Paste HTML Snapshot
+        </button>
+        <button class="sound-btn" id="sound-toggle" onclick="toggleSound()">
+          🔊 Sound FX: ON
+        </button>
+      </div>
+    </div>
+
+    <!-- Dynamic Guild Filter Pills (ALL Clans) -->
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Clan:</span>
+      <div class="guild-pills" id="guild-filters">
+        <!-- Dynamically generated for ALL clans -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Table Card Header Count -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding:0 4px;">
+    <span style="font-size:12px; font-weight:700; color:var(--text-muted);" id="player-count-indicator">Menampilkan 67 dari 67 Player</span>
+    <span style="font-size:11px; color:var(--accent-gold); cursor:pointer;" onclick="scrollToChaos()">👑 Lompat ke CHAOS KONTOL</span>
+  </div>
+
+  <!-- Leaderboard Table Card -->
+  <div class="glass-card table-container">
+    <table class="lb-table">
+      <thead>
+        <tr>
+          <th style="text-align:center;">#</th>
+          <th>Character / Player</th>
+          <th style="text-align:right;">Score</th>
+          <th style="text-align:right;">Gain</th>
+          <th style="text-align:right;">Daily Gain (SGT)</th>
+          <th style="text-align:center;">Jam Aktif (Hari Ini)</th>
+          <th style="text-align:center;">Total Jam Aktif</th>
+          <th style="text-align:center;">Status</th>
+          <th style="text-align:center;">Trend</th>
+        </tr>
+      </thead>
+      <tbody id="lb-tbody">
+        <!-- Rendered ALL players via JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    PVE Leaderboard Tracker by KONTOL &copy; 2026
+  </footer>
+
+</div>
+
+<!-- Floating Action Buttons for iPhone -->
+<div class="fab-container">
+  <button class="fab-btn" onclick="scrollToChaos()" title="Lompat ke CHAOS KONTOL">👑</button>
+  <button class="fab-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Ke Atas">⬆️</button>
+</div>
+
+<!-- Player Trend Modal -->
+<div class="modal-backdrop" id="player-modal">
+  <div class="glass-card modal-card">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2 id="modal-player-name" style="font-size:20px; color:#fff;">Player Statistics</h2>
+    <p style="font-size:12px; color:var(--text-muted);" id="modal-player-sub">Pergerakan Skor & Riwayat Pertandingan</p>
+    
+    <div class="canvas-container">
+      <canvas id="trendChart"></canvas>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:16px; text-align:center;">
+      <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:10px;">
+        <div style="font-size:9px; color:var(--text-muted);">DAILY GAIN (SGT)</div>
+        <div style="font-size:14px; font-weight:700; color:var(--accent-gold);" id="modal-avg-gain">+12,500</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:10px;">
+        <div style="font-size:9px; color:var(--text-muted);">ACTIVE TODAY (SGT)</div>
+        <div style="font-size:14px; font-weight:700; color:#fff;" id="modal-active-time">12.4 hrs</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:10px;">
+        <div style="font-size:9px; color:var(--text-muted);">TOTAL ACTIVE HOURS</div>
+        <div style="font-size:13px; font-weight:700; color:var(--accent-green);" id="modal-total-active">44.8 hrs</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ingest HTML Modal -->
+<div class="modal-backdrop" id="ingest-modal">
+  <div class="glass-card modal-card">
+    <button class="modal-close" onclick="closeIngestModal()">✕</button>
+    <h2 style="font-size:18px; color:#fff;">📥 Update Skor via HTML Snapshot</h2>
+    <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Paste kode HTML dari website game untuk langsung meng-update skor secara realtime bagi SEMUA pengunjung!</p>
+    
+    <textarea id="ingest-html-input" style="width:100%; height:140px; background:rgba(0,0,0,0.4); border:1px solid var(--border-glass); border-radius:10px; padding:10px; color:#fff; font-size:11px; font-family:monospace; outline:none;" placeholder="Paste elemen <table class='lb-table'>...</table> di sini..."></textarea>
+    
+    <button class="action-btn" style="width:100%; margin-top:12px; justify-content:center; padding:10px;" onclick="submitIngestHTML()">
+      💾 Update & Sync Leaderboard Now
+    </button>
+  </div>
+</div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW Reg Error', err));
+  }
+
+  let leaderboardData = [];
+  let currentGuildFilter = 'ALL';
+  let soundEnabled = true;
+  let targetEnd = new Date("2026-09-07T00:00:00+08:00").getTime();
+
+  function playVictoryChime() {
+    if (!soundEnabled) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc1.type = 'sine';
+      osc2.type = 'triangle';
+
+      osc1.frequency.setValueAtTime(523.25, now);
+      osc1.frequency.exponentialRampToValueAtTime(659.25, now + 0.15);
+      osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.3);
+
+      osc2.frequency.setValueAtTime(1046.50, now + 0.15);
+
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now + 0.15);
+      osc1.stop(now + 0.6);
+      osc2.stop(now + 0.6);
+    } catch(e) {}
+  }
+
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('sound-toggle').innerText = soundEnabled ? '🔊 Sound FX: ON' : '🔇 Sound FX: OFF';
+  }
+
+  function updateSGTClock() {
+    const now = new Date();
+    const sgt = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (8 * 3600000));
+    const hours = String(sgt.getHours()).padStart(2, '0');
+    const minutes = String(sgt.getMinutes()).padStart(2, '0');
+    const seconds = String(sgt.getSeconds()).padStart(2, '0');
+    document.getElementById('sgt-clock').innerText = `Singapore Time (SGT UTC+8): ${hours}:${minutes}:${seconds}`;
+  }
+  setInterval(updateSGTClock, 1000);
+  updateSGTClock();
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const diff = targetEnd - now;
+    if (diff <= 0) return;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-d').innerText = String(d).padStart(2, '0');
+    document.getElementById('cd-h').innerText = String(h).padStart(2, '0');
+    document.getElementById('cd-m').innerText = String(m).padStart(2, '0');
+    document.getElementById('cd-s').innerText = String(s).padStart(2, '0');
+  }
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+
+  function extractClan(name) {
+    if (name.startsWith("CHAOS")) return "CHAOS";
+    if (name.includes("DoA") || name.includes("𝓓𝓸𝓐") || name.includes("DøA")) return "DoA";
+    if (name.startsWith("TDY")) return "TDY";
+    if (name.startsWith("LMN")) return "LMN";
+    if (name.toLowerCase().includes("anbu") || name.includes("αηвυ")) return "ANBU";
+    if (name.includes("SØΛ")) return "SOA";
+    if (name.startsWith("J͎G͎")) return "JG";
+    if (name.startsWith("PF")) return "PF";
+
+    const bulletMatch = name.match(/^([A-Za-z0-9]+)\s*[•·|]/);
+    if (bulletMatch) return bulletMatch[1].toUpperCase();
+
+    return "SOLO";
+  }
+
+  async function loadData() {
+    try {
+      let res = await fetch('/api/leaderboard');
+      if (!res.ok) throw new Error("API fallback");
+      const json = await res.json();
+      if (json && json.players) {
+        leaderboardData = json.players;
+        if (json.season) document.getElementById('season-title-val').innerText = json.season;
+        if (json.next_round_end) targetEnd = new Date(json.next_round_end).getTime();
+        if (json.online_count !== undefined) document.getElementById('online-count-val').innerText = `${json.online_count} Online`;
+      }
+    } catch(err) {
+      let res = await fetch('initial_data.json');
+      const json = await res.json();
+      leaderboardData = json.players;
+      if (json.season) document.getElementById('season-title-val').innerText = json.season;
+      if (json.next_round_end) targetEnd = new Date(json.next_round_end).getTime();
+      if (json.online_count !== undefined) document.getElementById('online-count-val').innerText = `${json.online_count} Online`;
+    }
+
+    leaderboardData.forEach(p => {
+      p.guild = extractClan(p.name);
+    });
+
+    renderGuildFilterPills();
+    renderGuildStandings();
+    renderTable();
+    updateHeaderStats();
+  }
+
+  async function triggerManualSync() {
+    const btn = document.querySelectorAll('.action-btn')[0];
+    btn.innerText = '⏳ Syncing...';
+    try {
+      let res = await fetch('/api/sync');
+      if (res.ok) {
+        let json = await res.json();
+        if (json && json.data && json.data.players) {
+          leaderboardData = json.data.players;
+        }
+      }
+    } catch(e) {}
+    await loadData();
+    btn.innerText = '✅ Synced!';
+    setTimeout(() => { btn.innerText = '🔄 Sync Live Data'; }, 2000);
+  }
+
+  function openIngestModal() {
+    document.getElementById('ingest-modal').classList.add('active');
+  }
+
+  function closeIngestModal() {
+    document.getElementById('ingest-modal').classList.remove('active');
+  }
+
+  async function submitIngestHTML() {
+    const htmlText = document.getElementById('ingest-html-input').value;
+    if (!htmlText) return alert("Silakan paste HTML snapshot terlebih dahulu!");
+
+    try {
+      let res = await fetch('/api/ingest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html: htmlText })
+      });
+      if (res.ok) {
+        let json = await res.json();
+        if (json && json.data && json.data.players) {
+          leaderboardData = json.data.players;
+        }
+        closeIngestModal();
+        await loadData();
+        alert("✅ Skor berhasil diperbarui untuk SEMUA pengunjung!");
+      } else {
+        alert("Gagal meng-ingest HTML. Cek format HTML!");
+      }
+    } catch(e) {
+      alert("Error saat koneksi ke Worker: " + e.message);
+    }
+  }
+
+  setInterval(loadData, 10000);
+
+  function updateHeaderStats() {
+    const chaosIndex = leaderboardData.findIndex(p => p.name === 'CHAOS KONTOL');
+    if (chaosIndex !== -1) {
+      const chaos = leaderboardData[chaosIndex];
+      document.getElementById('chaos-rank-val').innerText = chaos.rank;
+      document.getElementById('chaos-score-val').innerText = chaos.score.toLocaleString();
+      document.getElementById('chaos-daily-val').innerText = `+${chaos.daily_gain.toLocaleString()}`;
+
+      if (chaosIndex > 0) {
+        const aheadPlayer = leaderboardData[chaosIndex - 1];
+        const gap = aheadPlayer.score - chaos.score;
+        const estMatches = Math.ceil(gap / 12500) || 1;
+        document.getElementById('target-player-name').innerText = aheadPlayer.name;
+        document.getElementById('target-gap-val').innerText = `+${gap.toLocaleString()} pts (~${estMatches} match${estMatches > 1 ? 'es' : ''})`;
+      } else {
+        document.getElementById('target-player-name').innerText = 'TOP #1 RANK!';
+        document.getElementById('target-gap-val').innerText = '👑 LEADER OF THE BOARD';
+      }
+    }
+  }
+
+  function renderGuildFilterPills() {
+    const clanCounts = {};
+    leaderboardData.forEach(p => {
+      const g = p.guild || "SOLO";
+      clanCounts[g] = (clanCounts[g] || 0) + 1;
+    });
+
+    const clans = Object.keys(clanCounts).sort((a, b) => clanCounts[b] - clanCounts[a]);
+    const pillsContainer = document.getElementById('guild-filters');
+
+    const emojiMap = {
+      'CHAOS': '🔥', 'DoA': '⚔️', 'TDY': '⚡', 'LMN': '🍃', 'ANBU': '🥷', 'SOA': '🌀', 'JG': '🛡️', 'PF': '👑', 'SOLO': '👤'
+    };
+
+    let html = `<div class="guild-pill ${currentGuildFilter === 'ALL' ? 'active' : ''}" onclick="filterGuild('ALL')">ALL (${leaderboardData.length})</div>`;
+
+    clans.forEach(c => {
+      const emoji = emojiMap[c] || '🛡️';
+      html += `
+        <div class="guild-pill ${currentGuildFilter === c ? 'active' : ''}" onclick="filterGuild('${c}')">
+          ${emoji} ${c} (${clanCounts[c]})
+        </div>
+      `;
+    });
+
+    pillsContainer.innerHTML = html;
+  }
+
+  function renderGuildStandings() {
+    const guildStats = {};
+    leaderboardData.forEach(p => {
+      const g = p.guild || "SOLO";
+      if (!guildStats[g]) {
+        guildStats[g] = { name: g, totalScore: 0, count: 0, topPlayer: p.name, topScore: p.score };
+      }
+      guildStats[g].totalScore += p.score;
+      guildStats[g].count += 1;
+    });
+
+    const sortedGuilds = Object.values(guildStats).sort((a, b) => b.totalScore - a.totalScore);
+    const container = document.getElementById('guild-standings-grid');
+    document.getElementById('clan-count-badge').innerText = `${sortedGuilds.length} Clans Detected`;
+
+    const colorMap = {
+      'CHAOS': '#ff85a2', 'DoA': '#d8b4fe', 'TDY': '#93c5fd', 'LMN': '#86efac', 'ANBU': '#fef08a', 'SOA': '#f472b6'
+    };
+
+    container.innerHTML = sortedGuilds.map((g, idx) => `
+      <div class="guild-box" onclick="filterGuild('${g.name}')">
+        <div class="guild-box-header">
+          <span style="color:${colorMap[g.name] || '#e2e8f0'};">
+            #${idx + 1} ${g.name} (${g.count} Ninja)
+          </span>
+          <span style="font-size:10px; color:var(--text-dim);">AVG: ${Math.round(g.totalScore / g.count).toLocaleString()}</span>
+        </div>
+        <div class="guild-box-score">${g.totalScore.toLocaleString()} pts</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+          👑 Top: <b>${escapeHtml(g.topPlayer)}</b>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterGuild(guild) {
+    currentGuildFilter = guild;
+    renderGuildFilterPills();
+    renderTable();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('lb-tbody');
+    const search = document.getElementById('search-input').value.toLowerCase().trim();
+
+    let filtered = leaderboardData.filter(p => {
+      const matchName = p.name.toLowerCase().includes(search) || (p.guild && p.guild.toLowerCase().includes(search));
+      const matchGuild = currentGuildFilter === 'ALL' || p.guild === currentGuildFilter;
+      return matchName && matchGuild;
+    });
+
+    document.getElementById('player-count-indicator').innerText = `Menampilkan ${filtered.length} dari ${leaderboardData.length} Player`;
+
+    tbody.innerHTML = filtered.map(p => {
+      const isChaos = p.name === 'CHAOS KONTOL';
+      const rankClass = p.rank === 1 ? 'rank-1' : (p.rank === 2 ? 'rank-2' : (p.rank === 3 ? 'rank-3' : (p.rank <= 10 ? 'rank-top10' : '')));
+      const rankDisplay = p.rank <= 3 ? (p.rank === 1 ? '🥇 1' : (p.rank === 2 ? '🥈 2' : '🥉 3')) : p.rank;
+      
+      const guildBadge = p.guild && p.guild !== 'SOLO' ? `<span class="guild-tag">${p.guild}</span>` : '';
+      const gainVal = p.gain || 0;
+      const gainDisplay = gainVal > 0 ? `<span class="gain-badge">+${gainVal.toLocaleString()}</span>` : '<span style="color:var(--text-dim);">-</span>';
+      
+      const hoursToday = p.active_hours_today || p.active_hours || 0;
+      const totalHours = p.total_active_hours || (hoursToday * 3.2);
+
+      return `
+        <tr class="${isChaos ? 'tr-chaos-kontol' : ''}" id="row-${escapeHtml(p.name).replace(/\s+/g, '-')}">
+          <td class="rank-cell ${rankClass}">${rankDisplay}</td>
+          <td>
+            <div class="player-cell">
+              ${isChaos ? '👑 ' : ''}
+              <span>${escapeHtml(p.name)}</span>
+              ${isChaos ? '<span class="you-badge">YOU</span>' : ''}
+              ${guildBadge}
+            </div>
+          </td>
+          <td class="score-cell">${p.score.toLocaleString()}</td>
+          <td style="text-align:right;">${gainDisplay}</td>
+          <td style="text-align:right; font-weight:600; color:var(--accent-green);">+${p.daily_gain.toLocaleString()}</td>
+          <td style="text-align:center; font-weight:600; color:var(--accent-gold);">${hoursToday} hrs</td>
+          <td style="text-align:center; font-weight:600; color:var(--text-muted);">${totalHours} hrs</td>
+          <td style="text-align:center;">
+            <span class="online-badge">
+              <i class="status-dot ${p.is_online ? 'online' : 'offline'}"></i>
+              ${p.is_online ? 'Online' : 'Offline'}
+            </span>
+          </td>
+          <td style="text-align:center;">
+            <button class="trend-btn" onclick="openPlayerModal('${escapeHtml(p.name)}')">📈 Chart</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function scrollToChaos() {
+    const el = document.querySelector('.tr-chaos-kontol');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      playVictoryChime();
+    }
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  }
+
+  function openPlayerModal(name) {
+    const player = leaderboardData.find(p => p.name === name);
+    if (!player) return;
+
+    const hoursToday = player.active_hours_today || player.active_hours || 0;
+    const totalHours = player.total_active_hours || (hoursToday * 3.2);
+
+    document.getElementById('modal-player-name').innerText = player.name;
+    document.getElementById('modal-active-time').innerText = `${hoursToday} hrs`;
+    document.getElementById('modal-total-active').innerText = `${totalHours} hrs`;
+    document.getElementById('modal-avg-gain').innerText = `+${player.daily_gain.toLocaleString()}`;
+
+    document.getElementById('player-modal').classList.add('active');
+    renderChart(player);
+
+    if (name === 'CHAOS KONTOL') {
+      playVictoryChime();
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('player-modal').classList.remove('active');
+  }
+
+  function renderChart(player) {
+    const canvas = document.getElementById('trendChart');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const points = [];
+    const baseScore = player.score - player.daily_gain;
+    for (let i = 0; i <= 10; i++) {
+      points.push(baseScore + (player.daily_gain * (i / 10)));
+    }
+
+    const padding = 30;
+    const w = canvas.width - padding * 2;
+    const h = canvas.height - padding * 2;
+    const minVal = Math.min(...points);
+    const maxVal = Math.max(...points);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = padding + (h * (i / 4));
+      ctx.beginPath();
+      ctx.moveTo(padding, y);
+      ctx.lineTo(canvas.width - padding, y);
+      ctx.stroke();
+    }
+
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, '#ff2a5f');
+    gradient.addColorStop(1, '#f5c451');
+
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+
+    points.forEach((val, idx) => {
+      const x = padding + (w * (idx / (points.length - 1)));
+      const y = padding + h - (h * ((val - minVal) / (maxVal - minVal || 1)));
+      if (idx === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    const areaGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    areaGrad.addColorStop(0, 'rgba(255, 42, 95, 0.25)');
+    areaGrad.addColorStop(1, 'rgba(255, 42, 95, 0)');
+    ctx.fillStyle = areaGrad;
+    ctx.lineTo(canvas.width - padding, padding + h);
+    ctx.lineTo(padding, padding + h);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>
