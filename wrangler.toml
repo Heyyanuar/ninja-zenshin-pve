@@ -1,10 +1,6 @@
 name = "ninja-pve-leaderboard"
-main = "worker/index.js"
 compatibility_date = "2026-07-05"
 pages_build_output_dir = "public"
-
-[triggers]
-crons = ["* * * * *"] # Run every 1 minute
 
 [vars]
 TARGET_GAME_URL = "https://ninjazenshin.online/pve-leaderboard"
